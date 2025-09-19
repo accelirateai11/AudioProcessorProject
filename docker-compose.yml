@@ -1,0 +1,49 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  transcription-service:
+    build: .
+    container_name: audio-transcription
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - WORKERS=1
+      - MODEL_CACHE_DIR=/app/models
+      - TORCH_HOME=/app/models
+      - HF_HOME=/app/models
+      - TRANSFORMERS_CACHE=/app/models
+    volumes:
+      # Mount models directory for persistence
+      - ./models:/app/models
+      # Mount samples for testing
+      - ./samples:/app/samples
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 2G
+    networks:
+      - transcription-net
+
+  # Optional: Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: transcription-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - transcription-service
+    networks:
+      - transcription-net
+    profiles:
+      - production
+
+networks:
+  transcription-net:
+    driver: bridge

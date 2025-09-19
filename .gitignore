@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Virtual environments
+venv/
+.env/
+.env.*  # dotenv files
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# VSCode settings
+.vscode/
+
+# MacOS files
+.DS_Store
+
+# Model and cache directories
+models/
+stems/
+*.ckpt
+*.pth
+*.pt
+*.th
+.cache/
+*.log
+
+# Docker artifacts
+*.pid
+*.db
+*.sqlite3
+
+# Test outputs
+*.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+.coverage.*
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+
+# System files
+Thumbs.db
+
+# Node (if any frontend)
+node_modules/
+
+# Ignore test audio files
+tests/*.mp3
+
+# Ignore output files
+output/
+transcripts/
