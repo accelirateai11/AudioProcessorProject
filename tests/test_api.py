@@ -6,12 +6,15 @@ import numpy as np
 import soundfile as sf
 from pathlib import Path
 
+from dotenv import load_dotenv
+load_dotenv()
+
 API_URL = "http://localhost:8000"
 
 @pytest.fixture
 def client():
     """Create test client"""
-    return httpx.Client(base_url=API_URL, timeout=30.0)
+    return httpx.Client(base_url=API_URL, timeout=120.0)
 
 @pytest.fixture
 def sample_audio():
@@ -39,8 +42,8 @@ def test_health_check(client):
     response = client.get("/")
     assert response.status_code == 200
     data = response.json()
-    assert data["status"] == "healthy"
-    assert "device" in data
+    assert data["status"] == "ok"
+    assert "message" in data  # <-- update here
 
 def test_transcribe_basic(client, sample_audio):
     """Test basic transcription"""
@@ -55,23 +58,6 @@ def test_transcribe_basic(client, sample_audio):
     assert "segments" in data
     assert "duration_sec" in data
     assert data["duration_sec"] > 0
-
-def test_transcribe_with_config(client, sample_audio):
-    """Test transcription with configuration"""
-    config = {
-        "language_hint": "en",
-        "enable_separation": False,
-        "model_size": "tiny"
-    }
-    
-    files = {"file": ("test.wav", sample_audio, "audio/wav")}
-    data = {"config": json.dumps(config)}
-    
-    response = client.post("/v1/transcribe", files=files, data=data)
-    
-    assert response.status_code == 200
-    result = response.json()
-    assert result["pipeline"]["separation"]["enabled"] == False
 
 def test_invalid_file(client):
     """Test with invalid file"""

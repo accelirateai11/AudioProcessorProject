@@ -4,6 +4,8 @@ import sys
 import torch
 from typing import Dict, Any, Optional, List
 from contextvars import ContextVar
+from dotenv import load_dotenv
+load_dotenv()
 
 # Request ID context variable for tracing
 request_id_var = ContextVar('request_id', default=None)

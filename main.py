@@ -19,6 +19,10 @@ from src.transcriber import Transcriber
 from src.utils import setup_logging, get_device_info
 from src.utils import TranscriptionConfig, TranscriptionResponse, AudioSegment
 
+from dotenv import load_dotenv
+load_dotenv()
+
+
 # Setup logging
 logger = setup_logging()
 
@@ -26,6 +30,10 @@ logger = setup_logging()
 audio_processor = None
 separator = None
 transcriber = None
+
+# Read SAVE_STEMS flag from environment
+# print(os.getenv("SAVE_STEMS"))
+SAVE_STEMS = os.getenv("SAVE_STEMS").lower() == "true"
 
 # Update the lifespan function to create separator with output_dir
 @asynccontextmanager
@@ -41,8 +49,9 @@ async def lifespan(app: FastAPI):
     logger.info(f"Device info: {device_info}")
     
     # Create default output directory for stems
-    stems_dir = os.path.join(os.getcwd(), "stems")
-    os.makedirs(stems_dir, exist_ok=True)
+    stems_dir = os.path.join(os.getcwd(), "stems") if SAVE_STEMS else None
+    if stems_dir:
+        os.makedirs(stems_dir, exist_ok=True)
     
     audio_processor = AudioProcessor()
     separator = VocalSeparator(device=device_info['device'], output_dir=stems_dir)
@@ -134,10 +143,12 @@ async def transcribe(
         if file_size == 0:
             raise HTTPException(status_code=400, detail="Empty file")
         
-        # Create request-specific stems directory
-        stems_dir = os.path.join(os.getcwd(), "stems", request_id)
-        os.makedirs(stems_dir, exist_ok=True)
-        
+        # Create request-specific stems directory if saving is enabled
+        stems_dir = None
+        if SAVE_STEMS:
+            stems_dir = os.path.join(os.getcwd(), "stems", request_id)
+            os.makedirs(stems_dir, exist_ok=True)
+
         # Save uploaded file temporarily
         with tempfile.NamedTemporaryFile(delete=False, suffix=file_ext) as tmp_file:
             tmp_file.write(contents)
@@ -175,10 +186,6 @@ async def transcribe(
                     logger.warning(f"Request {request_id}: VAD failed: {str(e)}, using original audio")
             
             # Vocal separation
-            separation_enabled = False
-            separation_method = None
-            stems_location = None
-            
             if config_obj.enable_separation and separator:
                 sep_start = time.time()
                 try:
@@ -186,7 +193,7 @@ async def transcribe(
                         audio_data, 
                         sample_rate,
                         file_name=file.filename,
-                        output_dir=stems_dir
+                        output_dir=stems_dir  # Will be None if SAVE_STEMS is False
                     )
                     if separated_audio is not None:
                         audio_data = separated_audio

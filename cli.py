@@ -11,7 +11,8 @@ from pathlib import Path
 from typing import Optional, Dict, Any
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
-
+from dotenv import load_dotenv
+load_dotenv()
 console = Console()
 
 def transcribe_file(

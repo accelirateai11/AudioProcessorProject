@@ -8,6 +8,9 @@ import soundfile as sf
 import librosa
 from typing import List, Dict, Any
 
+from dotenv import load_dotenv
+load_dotenv()
+
 logger = logging.getLogger(__name__)
 
 class AudioProcessor:

@@ -5,6 +5,9 @@ import torch
 import numpy as np
 from typing import Dict, Any, Optional, List
 
+from dotenv import load_dotenv
+load_dotenv()
+
 logger = logging.getLogger(__name__)
 
 class Transcriber:
