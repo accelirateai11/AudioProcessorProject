@@ -21,7 +21,7 @@ A containerized microservice that accepts audio files, separates vocals from bac
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/audio-transcription-service.git
+git clone https://github.com/accelirateai11/AudioProcessorProject.git
 cd audio-transcription-service
 
 # Build and run with Docker Compose
@@ -33,8 +33,6 @@ docker-compose up --build
 ### Local Installation
 
 ```bash
-# Install system dependencies
-sudo apt-get install ffmpeg python3.10 python3-pip
 
 # Create virtual environment
 python -m venv venv
